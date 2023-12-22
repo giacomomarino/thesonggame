@@ -28,6 +28,7 @@ async function authenticate() {
 
   authUrl.search = new URLSearchParams(params).toString();
   window.location.href = authUrl.toString();
+  
 }
 
 
@@ -64,8 +65,6 @@ function App() {
   createEffect(() => {
     if (authenticated()) return <Navigate href='/user'></Navigate>
   })
-
-  console.log(window.location.href)
 
   return (
     <>

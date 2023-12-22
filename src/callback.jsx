@@ -1,18 +1,14 @@
 import { useNavigate } from "@solidjs/router";
 
-async function Callback() {
+function Callback() {
   const navigate = useNavigate()
 
   async function getToken() {
     const args = new URLSearchParams(window.location.search);
     const code = args.get('code');
-    console.log(code)
     if (!code) {
       return;
     }
-
-   
-
     // stored in the previous step
     let codeVerifier = localStorage.getItem('code_verifier');
     const clientId = import.meta.env.VITE_CLIENT_ID || ''
@@ -39,19 +35,20 @@ async function Callback() {
 
     if (body.status != 200) return;
     const response = await body.json();
-    console.log('Access Token:', response)
-    
+    console.log('Access Token:', response.access_token)
+    console.log('Refresh Token:', response.refresh_token)
+
     localStorage.setItem('access_token', response.access_token);
-    localStorage.setItem('refresh_token', response.access_token);
+    localStorage.setItem('refresh_token', response.refresh_token);
     navigate('/user', { replace: true })
   }
 
-  await getToken();
+  getToken();
 
   return (
     <>
       <p>Error recieving Authoriziation token...</p>
-      <button href="/">Return to home page</button>
+      <button  onClick={navigate("/")}>Return to home page</button>
     </>
   )
 }

@@ -13,32 +13,44 @@ export async function fetchWebApi(endpoint, method, body) {
       method,
       body: JSON.stringify(body)
     })
+    if (response.message === 'The access token expired') {
+      console.log(response)
+      await getRefreshToken();
+      //return await fetchWebApi(endpoint, method, body);
+    }
     const data = await response.json();
-    console.log(data)
     return data
   }
-  catch (err) {
-    console.log(err)
-    return err
+  catch (error) {
+    console.log(error)
+    return error
   }
 }
 
 
 
 export async function checkAuth() {
+  let response;
   if (localStorage.getItem('access_token')) {
     try {
-      response = await fetch(`${BASEURL}${endpoint}`, {
+      response = await fetch(`${BASEURL}v1/me`, {
         headers: {
-          Authorization: 'Bearer ' + accessToken
+          Authorization: 'Bearer ' + localStorage.getItem('access_token')
         },
-        method
+        method: 'GET'
       })
+      if (response.message === 'The access token expired') {
+        await getRefreshToken();
+        
+      }
+
+
       if (response.status === 200) {
         return true
       } else return false
 
     } catch (error) {
+      console.log(error)
       return false
     }
   }
@@ -74,3 +86,28 @@ async function createPlaylist(tracksUri) {
 
   return playlist;
 }
+
+const getRefreshToken = async () => {
+
+   // refresh token that has been previously stored
+   const refreshToken = localStorage.getItem('refresh_token');
+   const url = "https://accounts.spotify.com/api/token";
+   const clientId = import.meta.env.VITE_CLIENT_ID || ''
+
+    const payload = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      body: new URLSearchParams({
+        grant_type: 'refresh_token',
+        refresh_token: refreshToken,
+        client_id: clientId
+      }),
+    }
+    const body = await fetch(url, payload);
+    const response = await body.json();
+
+    if (response.accessToken) localStorage.setItem('access_token', response.accessToken);
+    if (response.refreshToken) localStorage.setItem('refresh_token', response.refreshToken);
+  }

@@ -3,6 +3,7 @@ import './App.css'
 import { checkAuth } from './fetchSpotify';
 import { Navigate } from "@solidjs/router";
 
+
 async function authenticate() {
   const clientId = import.meta.env.VITE_CLIENT_ID || ''
   const redirectUri =  `${window.location.href}callback`;
@@ -58,18 +59,18 @@ function App() {
  
   const [authenticated, setAuthenticated] = createSignal(false)
 
-  const auth = checkAuth().then((res) => {
+  checkAuth().then((res) => {
     setAuthenticated(res)
   })
 
   createEffect(() => {
-    if (authenticated()) return <Navigate href='/user'></Navigate>
+    //if (authenticated()) return <Navigate href='/user'></Navigate>
   })
 
   return (
-    <>
-      <div className='flex justify-center text-center mb-5'>
-          <img className="rounded-xl border border-slate-400" src={'images/thesonggamelogo.png'} width="200vh" class="logo" alt="logo" />
+    <div className='flex-col'>
+      <div className='justify-center text-center mb-5'>
+          <img className="rounded-xl border border-slate-400 mx-auto" src={'images/thesonggamelogo.png'} width="200vh" class="logo" alt="logo" />
       </div>
       <h1>The Song Game</h1>
       <div class="card">
@@ -84,7 +85,7 @@ function App() {
       <p class="read-the-docs">
         Start by logging in using your Spotify Account
       </p>
-    </>
+    </div>
   )
 }
 

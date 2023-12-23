@@ -2,7 +2,7 @@
 
 function Song({songObject}) {
     return (
-        <div className="song rounded-lg border border-black dark:border-white p-2 m-2 col-auto min-w-full">
+        <div className="song rounded-lg border border-black dark:border-white p-2 m-2 col-auto min-w-1/2 mx-10">
             <div className="justify-center text-left w-9/12">
                 <p className="text-lg font-sans font-semibold">{songObject.name}</p>
                 <p className="subtitle">{songObject.artists.map((a) => a.name)}</p>

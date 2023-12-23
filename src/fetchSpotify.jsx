@@ -1,5 +1,7 @@
-
+import { useNavigate } from "@solidjs/router";
 const BASEURL = 'https://api.spotify.com/'
+
+
 
 export async function fetchWebApi(endpoint, method, body) {
   let accessToken = localStorage.getItem('access_token');
@@ -13,7 +15,7 @@ export async function fetchWebApi(endpoint, method, body) {
       method,
       body: JSON.stringify(body)
     })
-    if (response.message === 'The access token expired') {
+    if (response.message === 'The access token expired' || response.status === 401) {
       console.log(response)
       await getRefreshToken();
       //return await fetchWebApi(endpoint, method, body);
@@ -23,7 +25,7 @@ export async function fetchWebApi(endpoint, method, body) {
   }
   catch (error) {
     console.log(error)
-    return error
+    throw new Error(error)
   }
 }
 
@@ -106,6 +108,12 @@ const getRefreshToken = async () => {
       }),
     }
     const body = await fetch(url, payload);
+
+    if (body.status != 200)  {
+      console.log(body)
+      navigate('/')
+      return;
+    }
     const response = await body.json();
 
     if (response.accessToken) localStorage.setItem('access_token', response.accessToken);

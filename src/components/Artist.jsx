@@ -2,7 +2,7 @@
 
 function Artist({artistObject}) {
     return (
-        <div className="song rounded-lg border border-black dark:border-white p-2 m-2 col-auto flex min-w-full">
+        <div className="song rounded-lg border border-black dark:border-white p-2 m-2 col-auto flex min-w-1/2 mx-10">
             <div className="col-span-4 justify-center text-left w-10/12 my-auto">
                 <p className="text-lg font-sans font-semibold">{artistObject.name}</p>
             </div>

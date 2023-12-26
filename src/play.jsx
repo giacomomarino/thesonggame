@@ -3,32 +3,11 @@ import { fetchWebApi } from "./fetchSpotify";
 import { useNavigate } from "@solidjs/router";
 import Song from "./components/song"
 import Artist from "./components/Artist";
-import { fetchUser, addUser } from "./utils/userDb";
-
-
 
 function User() {
 
-  
-
-
   const navigate = useNavigate()
-
-  const fetchUserInfo = async () => (await fetchWebApi('v1/me', 'GET'));
-  const [userInfo] = createResource(fetchUserInfo);
-
-  const fetchDbUserInfo = async () => (await fetchUser('test'));
-  const [userInDb] = createResource(fetchDbUserInfo);
-
-  if (userInDb().length === 0 && userInfo()) {
-    addUser(userInfo().display_name, userInfo().email, userInfo().images[0].url)
-  }
-
-  const fetchTopSongs = async () => (await fetchWebApi('v1/me/top/tracks?time_range=long_term&limit=5', 'GET'));
-  const [topSongs] = createResource(fetchTopSongs);
-
-  const fetchTopArtists = async () => (await fetchWebApi('v1/me/top/artists?time_range=long_term&limit=5', 'GET'));
-  const [topArtists] = createResource(fetchTopArtists);
+  const [players, setPlayers] = createSignal([])
 
   return (
     <div className="flex-col w-full xs:w-full sm:w-full md:w-1/2 lg:w-1/3 xl:w-1/4">

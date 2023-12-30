@@ -2,11 +2,12 @@ import { createEffect, createSignal } from 'solid-js'
 import './App.css'
 import { checkAuth } from './fetchSpotify';
 import { Navigate } from "@solidjs/router";
+import { supabase } from './supabaseClient';
 
 
 async function authenticate() {
   const clientId = import.meta.env.VITE_CLIENT_ID || ''
-  const redirectUri =  `${window.location.href}callback`;
+  const redirectUri =  import.meta.env.VITE_REDIRECT_URI || '';
 
   const scope = 'user-read-private user-read-email playlist-modify-public playlist-modify-private app-remote-control user-top-read user-read-recently-played';
   const authUrl = new URL("https://accounts.spotify.com/authorize")
@@ -54,9 +55,10 @@ const base64encode = (input) => {
 
 
 
+
+
 function App() {
 
- 
   const [authenticated, setAuthenticated] = createSignal(false)
 
   checkAuth().then((res) => {
@@ -68,7 +70,7 @@ function App() {
   })
 
   return (
-    <div className='flex-col'>
+    <div className='flex-col my-auto'>
       <div className='justify-center text-center mb-5'>
           <img className="rounded-xl border border-slate-400 mx-auto" src={'images/thesonggamelogo.png'} width="200vh" class="logo" alt="logo" />
       </div>

@@ -1,28 +1,67 @@
-import { ErrorBoundary, createResource, Suspense } from "solid-js"
+import { ErrorBoundary, createResource, Suspense, createEffect, createSignal } from "solid-js"
 import { fetchWebApi } from "./fetchSpotify";
 import { useNavigate } from "@solidjs/router";
 import Song from "./components/song"
 import Artist from "./components/Artist";
-import { fetchUser, addUser } from "./utils/userDb";
-
-
+import { supabase } from "./supabaseClient";
 
 function User() {
 
-  
-
-
   const navigate = useNavigate()
+
+  const getProfile = async (spotId) => {
+    try {
+      const { data, error, status } = await supabase
+        .from('player')
+        .select(`spotifyId`)
+        .eq('spotifyId', spotId)
+  
+      if (error && status !== 406) {
+        throw error
+      }
+  
+      if (data.length === 0) {
+        updateProfile(userInfo())
+
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        alert(error.message)
+      }
+    }
+  }
+
+  createEffect(() => {
+    if (userInfo()) {
+      getProfile(userInfo().id)
+    }
+  })
+
+
+  
+  const updateProfile = async () => {
+  
+    try {
+      const playerData = {
+        spotifyId: userInfo().id,
+        name: userInfo().display_name,
+        img: userInfo().images[0].url,
+      }
+      const { error } = await supabase.from('player').upsert(playerData)
+  
+      if (error) {
+        throw error
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        alert(error.message)
+      }
+    }
+  }
 
   const fetchUserInfo = async () => (await fetchWebApi('v1/me', 'GET'));
   const [userInfo] = createResource(fetchUserInfo);
-
-  const fetchDbUserInfo = async () => (await fetchUser('test'));
-  const [userInDb] = createResource(fetchDbUserInfo);
-
-  if (userInDb().length === 0 && userInfo()) {
-    addUser(userInfo().display_name, userInfo().email, userInfo().images[0].url)
-  }
+  
 
   const fetchTopSongs = async () => (await fetchWebApi('v1/me/top/tracks?time_range=long_term&limit=5', 'GET'));
   const [topSongs] = createResource(fetchTopSongs);
@@ -32,6 +71,11 @@ function User() {
 
   return (
     <div className="flex-col w-full xs:w-full sm:w-full md:w-1/2 lg:w-1/3 xl:w-1/4">
+      <ErrorBoundary fallback={<><button className="btn my-auto mt-10"
+      onClick={(evt) => {
+        evt.preventDefault()
+        navigate('/')
+      }}>Please reauthorize Spotify</button></>}>
       <div className="text-xl text-right font-semibold object-cover p-4 pb-10 flex-row relative">
         {userInfo() && <div><p className="relative right-12">{userInfo().display_name.split(' ')[0]}
         </p>
@@ -80,6 +124,7 @@ function User() {
           </ErrorBoundary>
         </div>
       </div>
+      </ErrorBoundary>
     </div>
   )
 }

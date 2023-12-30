@@ -1,7 +1,4 @@
-import { useNavigate } from "@solidjs/router";
 const BASEURL = 'https://api.spotify.com/'
-
-
 
 export async function fetchWebApi(endpoint, method, body) {
   let accessToken = localStorage.getItem('access_token');
@@ -28,7 +25,6 @@ export async function fetchWebApi(endpoint, method, body) {
     throw new Error(error)
   }
 }
-
 
 
 export async function checkAuth() {
@@ -90,7 +86,6 @@ async function createPlaylist(tracksUri) {
 }
 
 const getRefreshToken = async () => {
-
    // refresh token that has been previously stored
    const refreshToken = localStorage.getItem('refresh_token');
    const url = "https://accounts.spotify.com/api/token";
@@ -111,7 +106,6 @@ const getRefreshToken = async () => {
 
     if (body.status != 200)  {
       console.log(body)
-      navigate('/')
       return;
     }
     const response = await body.json();

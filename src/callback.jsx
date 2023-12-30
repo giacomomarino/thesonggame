@@ -35,8 +35,6 @@ function Callback() {
 
     if (body.status != 200) return;
     const response = await body.json();
-    console.log('Access Token:', response.access_token)
-    console.log('Refresh Token:', response.refresh_token)
 
     localStorage.setItem('access_token', response.access_token);
     localStorage.setItem('refresh_token', response.refresh_token);

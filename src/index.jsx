@@ -6,6 +6,7 @@ import App from "./App";
 import User from './user';
 import Callback from './callback';
 import Create from './create';
+import Play from './play';
 
 const root = document.getElementById('root')
 
@@ -17,7 +18,7 @@ render(
                 <Route path="/user" component={User} />
                 <Route path="/callback" component={Callback} />
                 <Route path="/create" component={Create} />
-                <Route path="/play/:gamecode" component={Create} />
+                <Route path="/play/:gamecode" component={Play} />
             </Routes>
         </Router>
     ),

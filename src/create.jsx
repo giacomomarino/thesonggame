@@ -1,7 +1,9 @@
-import { createSignal, Show, batch } from "solid-js"
+import { createSignal, Show, batch, createResource } from "solid-js"
+import { fetchWebApi } from "./fetchSpotify";
 import { useNavigate } from "@solidjs/router";
 import Select from "./components/Select";
 import { AiOutlineArrowLeft } from 'solid-icons/ai'
+import { supabase } from "./supabaseClient";
 
 function makeid(length) {
   let result = '';
@@ -25,16 +27,17 @@ function Create() {
     try {
       const gameData = {
         gamecode: gameCode,
-        hostId: hostId,
+        hostid: hostId,
         songs: {},
         scores: {},
-        playerids: [hostId],
+        playerids: [],
         status: 'waiting',
-        numSongs: numSongs(),
+        theme: theme(),
+        numsongs: numSongs(),
       }
       if (automatic()) gameData.topsongs = useDateRange()
 
-      const { error } = await supabase.from('games').insert(gameData)
+      const { error } = await supabase.from('games').upsert(gameData)
   
       if (error) {
         throw error
@@ -54,6 +57,7 @@ function Create() {
 
   const [automatic, setAutomatic] = createSignal(false)
   const [numSongs, setNumSongs] = createSignal(2)
+  const [theme, setTheme] = createSignal('')
   const [numToSelectFrom, setNumToSelectFrom] = createSignal(2)
   const [useDateRange, setUseDateRange] = createSignal('long_term')
 
@@ -70,14 +74,18 @@ function Create() {
       </div>
       <div className="card mb-2 mt-3">
         <label for="theme" className="mr-2">Theme:</label>
-        <input id="theme" className="border border-black dark:border-white p-2 rounded-md text-lg w-7/12 h-8" placeholder="At the Beach"></input>
+        <input id="theme" className="border border-black dark:border-white p-2 rounded-md text-lg w-7/12 h-8" placeholder="At the Beach" value={theme()} 
+        onChange={(evt) => {
+          evt.preventDefault()
+          setTheme(evt.target.value)
+        }}>
+        </input>
       </div>
       <label class="relative inline-flex items-center cursor-pointer mt-5">
         <input type="checkbox" checked={automatic()} onChange={(evt) => {
           evt.preventDefault()
           batch(() => {
             setAutomatic(evt.target.checked)
-            setUseTopSongs(true)
           })
         }
         } class="sr-only peer" />
@@ -90,7 +98,6 @@ function Create() {
           evt.preventDefault()
           batch(() => {
             setNumSongs(evt.target.value)
-            setUseTopSongs(true)
           })
 
           if (numSongs() > numToSelectFrom()) {
@@ -113,7 +120,6 @@ function Create() {
           <input id="num-songs" type="range" min={numSongs()} max="50" value={numToSelectFrom()} step="1" onChange={(evt) => {
             evt.preventDefault()
             setNumToSelectFrom(evt.target.value)
-            setUseTopSongs(true)
           }}
             className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"></input>
           <label for="num-songs" className=" mb-2 text-sm font-medium text-gray-900 dark:text-white">Songs to Pick from: {numToSelectFrom()}</label>

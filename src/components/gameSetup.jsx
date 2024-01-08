@@ -1,9 +1,10 @@
 import {Show, ErrorBoundary} from "solid-js"
+import { supabase } from "../supabaseClient"
 
 function GameSetup({gamecode, players, playerInfo, isHost, gameInfo}) {
 
-    function startGame() {
-        
+    async function startGame() {
+        const { error } = await supabase.from('games').update({status: 'picking'}).match({gamecode: gamecode})
     }
 
     return (
@@ -34,7 +35,7 @@ function GameSetup({gamecode, players, playerInfo, isHost, gameInfo}) {
       </div>
       <Show when={isHost()}>
         <div class="card mt-5">
-          <button className="m-2" disabled={players().length <= 3} onClick={(evt) => {
+          <button className="m-2 disabled:text-opacity-50" disabled={players().length >= 3} onClick={(evt) => {
             evt.preventDefault()
             startGame()
           }}>

@@ -8,6 +8,7 @@ import { supabase } from "./supabaseClient";
 function User() {
 
   const navigate = useNavigate()
+  const [gamecode,setGamecode] = createSignal('')
 
   const getProfile = async (spotId) => {
     try {
@@ -84,12 +85,18 @@ function User() {
         </div>}
       </div>
       <div className="card mb-2">
-        <input className="border border-black dark:border-white p-2 rounded-md text-lg w-4/12" style={`maxWidth: 50rem`} placeholder="WZYX"></input>
+        <input className="border border-black dark:border-white p-2 rounded-md text-lg w-4/12" style={`maxWidth: 50rem`} 
+        placeholder="WZYX"
+        value={gamecode()}
+        onChange={(evt) => setGamecode(evt.target.value)}
+        >
+        
+        </input>
       </div>
       <div class="card mt-3">
         <button className="m-2" onClick={(evt) => {
           evt.preventDefault()
-          console.log(userInfo().images[0].url)
+          navigate(`/play/${gamecode()}`)
         }}>
           Join Game
         </button>

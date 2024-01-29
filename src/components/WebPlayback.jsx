@@ -17,7 +17,6 @@ function WebPlayback({ gameInfo, isHost }) {
         getOAuthToken: (cb) => {
           cb(localStorage.getItem("access_token"));
         },
-        volume: isHost ? 0.5 : 0
       });
 
       setPlayerObj(player);

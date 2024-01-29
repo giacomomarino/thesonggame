@@ -1,6 +1,6 @@
 {
   "name": "thesonggame",
-  "private": true,
+  "private": false,
   "version": "0.0.1",
   "type": "module",
   "scripts": {
@@ -9,15 +9,18 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@solid-primitives/script-loader": "^2.1.1",
     "@solidjs/router": "^0.8.4",
     "@supabase/supabase-js": "^2.39.1",
     "solid-cache": "^0.2.0",
     "solid-icons": "^1.1.0",
-    "solid-js": "^1.7.8"
+    "solid-js": "^1.7.8",
+    "solid-spotify-embed": "^0.1.0"
   },
   "devDependencies": {
     "@babel/core": "^7.23.6",
     "@babel/preset-env": "^7.23.6",
+    "@types/react": "^18.2.48",
     "autoprefixer": "^10.4.16",
     "babel-loader": "^9.1.3",
     "babel-plugin-dva-hmr": "^0.4.2",

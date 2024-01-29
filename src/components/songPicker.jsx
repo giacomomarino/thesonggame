@@ -1,7 +1,7 @@
 import { createSignal, createEffect, createResource, createMemo } from "solid-js";
 import { fetchWebApi } from "../fetchSpotify"
 import { supabase } from "../supabaseClient";
-import Song from "./song";
+import Song from "./Song";
 
 function slugify(input) {
     if (!input)

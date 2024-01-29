@@ -1,16 +1,34 @@
 import { createResource, createEffect, createSignal, createMemo } from "solid-js"
-import { fetchWebApi } from "./fetchSpotify";
 import { useNavigate } from "@solidjs/router";
+import { fetchWebApi } from "./fetchSpotify";
 import { useParams } from "@solidjs/router";
 import { supabase } from "./supabaseClient";
 import GameSetup from "./components/gameSetup";
 import SongPicker from "./components/songPicker";
 import Waiting from "./components/Waiting";
+import Voting from "./components/Voting";
+import Result from "./components/Result";
 
+function shuffle(array) {
+  let currentIndex = array.length,  randomIndex;
+
+  // While there remain elements to shuffle.
+  while (currentIndex > 0) {
+
+    // Pick a remaining element.
+    randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex--;
+
+    // And swap it with the current element.
+    [array[currentIndex], array[randomIndex]] = [
+      array[randomIndex], array[currentIndex]];
+  }
+
+  return array;
+}
 
 
 function Play() {
-
   const navigate = useNavigate()
   const [userId, setUserId] = createSignal([])
   const [players, setPlayers] = createSignal([])
@@ -26,7 +44,7 @@ function Play() {
     console.log(gameInfo().songs)
     if (gameInfo().songs) {
       console.log(gameInfo())
-      return Object.values(gameInfo().songs).flat()
+      return shuffle(Object.values(gameInfo().songs).flat())
     } else return []
   }, []
   )
@@ -57,11 +75,49 @@ function Play() {
     }
   })
 
-  const handleRecordUpdated = (payload) => {
+  const handleRecordUpdated = async (payload) => {
     console.log('Change received!', payload)
 
     setGameInfo(payload.new)
     setPlayers(payload.new.playerids)
+    console.log(payload.new)
+    if (payload.new.status === 'playing') {
+      console.log(payload.new.scores)
+      var votes = 0
+      Object.keys(payload.new.scores).forEach((player) => {
+        if (payload.new.scores[player][payload.new.currentsong]  ) {
+          votes += 1
+        }
+      })
+      if (votes == payload.new.playerids.length) {
+        var options = []
+        Object.values(gameInfo().songs).forEach((userSongs) => {
+          options.push(...userSongs)
+        })
+        var played;
+        if (gameInfo().songsplayed) {
+          console.log('here')
+          const prevSongs = gameInfo().songsplayed.filter((song) => song)
+          played = [...prevSongs, gameInfo().currentSong]
+        } else { 
+          played = [gameInfo().currentsong]
+        }
+        options = options.filter((song) => !played.includes(song))
+        console.log(options)
+        console.log("current song", gameInfo().currentsong)
+        console.log(options.length)
+        if (options.length > 0) {
+          console.log('hereere')
+          
+          console.log('setting song', options.at(0))
+          const {error} = await supabase.from('games').update({ currentsong: options.at(0), songsplayed: [options.at(0), ...played] }).eq('gamecode', params.gamecode)
+          console.log(error)
+        } else {
+          const {error} = await supabase.from('games').update({ status: 'results' }).eq('gamecode', params.gamecode)
+          console.log(error)
+        }
+      }
+    }
 
   }
 
@@ -124,8 +180,8 @@ function Play() {
     if (isHost() && gameInfo().status === 'picking') {
       if (Object.keys(gameInfo().songs).length === players().length) {
         const {error} = await supabase.from('games').update({ status: 'playing' }).eq('gamecode', params.gamecode)
+        const {error: error2} = await supabase.from('games').update({ currentsong: songsPicked().at(0) }).eq('gamecode', params.gamecode)
       }
-      console.log(error)
     }
   })
 
@@ -143,8 +199,10 @@ function Play() {
           <Waiting gameInfo={gameInfo} playerInfo={playerInfo}></Waiting>
       </Show>
       <Show when={gameInfo().status === "playing"}>
-          <p className="text-xl mt-5">Playing:</p>
-          <p className="font-extralight">Select the player you think picked this song!</p>
+          <Voting gameInfo={gameInfo} playerInfo={playerInfo} userId={userId}/>
+      </Show>
+      <Show when={gameInfo().status === "results"}>
+          <Result gameInfo={gameInfo} playerInfo={playerInfo}></Result>
       </Show>
     </div>
   )

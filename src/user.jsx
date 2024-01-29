@@ -1,7 +1,7 @@
 import { ErrorBoundary, createResource, Suspense, createEffect, createSignal } from "solid-js"
 import { fetchWebApi } from "./fetchSpotify";
 import { useNavigate } from "@solidjs/router";
-import Song from "./components/song"
+import Song from "./components/Song"
 import Artist from "./components/Artist";
 import { supabase } from "./supabaseClient";
 

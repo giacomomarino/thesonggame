@@ -9,7 +9,7 @@ async function authenticate() {
   const clientId = import.meta.env.VITE_CLIENT_ID || ''
   const redirectUri =  import.meta.env.VITE_REDIRECT_URI || '';
 
-  const scope = 'user-read-private user-read-email playlist-modify-public playlist-modify-private app-remote-control user-top-read user-read-recently-played';
+  const scope = 'user-read-private user-read-email playlist-modify-public playlist-modify-private app-remote-control user-top-read user-read-recently-played user-read-playback-state user-modify-playback-state app-remote-control streaming';
   const authUrl = new URL("https://accounts.spotify.com/authorize")
 
   const codeVerifier = generateRandomString(64);
@@ -52,9 +52,6 @@ const base64encode = (input) => {
     .replace(/\+/g, '-')
     .replace(/\//g, '_');
 }
-
-
-
 
 
 function App() {

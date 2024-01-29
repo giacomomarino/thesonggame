@@ -1,15 +1,9 @@
 import { defineConfig } from 'vite'
 import solid from 'vite-plugin-solid'
-import solidRefresh from 'solid-refresh/babel'
+import vercel from "solid-start-vercel";
 
 export default defineConfig({
-  plugins: [solid(
-    {
-      babel: {
-        plugins: [
-          [solidRefresh, { bundler: 'vite' }],
-        ],
-      },
-    }
-  )],
-})
+  plugins: [
+      solid({ adapter: vercel({ edge: true }) })
+  ],
+});

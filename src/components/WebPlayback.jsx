@@ -1,13 +1,14 @@
 import { onMount, createSignal, createEffect } from "solid-js";
 import Song from "./Song";
 
-function WebPlayback({ gameInfo }) {
+function WebPlayback({ gameInfo, isHost }) {
   const [playerObj, setPlayerObj] = createSignal(null);
   const [device, setDevice] = createSignal(null);
-  const [paused, setPaused] = createSignal(true);
+  const [paused, setPaused] = createSignal(!isHost);
   const [active, setActive] = createSignal(false);
   const [ready, setReady] = createSignal(false);
   const [track, setTrack] = createSignal(null);
+  const [songPlayed, setSongPlayed] = createSignal('');
 
   onMount(() => {
     window.onSpotifyWebPlaybackSDKReady = () => {
@@ -16,6 +17,7 @@ function WebPlayback({ gameInfo }) {
         getOAuthToken: (cb) => {
           cb(localStorage.getItem("access_token"));
         },
+        volume: isHost ? 0.5 : 0
       });
 
       setPlayerObj(player);
@@ -101,15 +103,18 @@ function WebPlayback({ gameInfo }) {
   });
 
   createEffect(async () => {
-    if (device() && gameInfo().currentsong) {
+    if (device() && gameInfo().currentsong && songPlayed() !== gameInfo().currentsong) {
       console.log(device());
       await playerObj().play({
         playerInstance: playerObj(),
         spotify_uri: `spotify:track:${gameInfo().currentsong}`,
         device_id: device(),
       });
+      setSongPlayed(gameInfo().currentsong)
     }
   });
+
+  console.log(track());
 
   return (
     <>
@@ -138,8 +143,12 @@ function WebPlayback({ gameInfo }) {
       <div className="w-full font-light flex justify-center pt-0 mt-0 mb-5">
         <button
           onClick={() => {
-            playerObj().togglePlay();
-            setPaused(false);
+            if (paused()) {
+              playerObj().setVolume(.5);
+            } else {
+              playerObj().setVolume(0);
+            }
+            setPaused(!paused());
           }}
           className="text-center mx-auto"
         >

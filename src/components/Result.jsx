@@ -7,14 +7,20 @@ import {
 } from "solid-js";
 import Song from "./Song";
 import { fetchWebApi } from "../fetchSpotify";
+import {AiOutlineArrowLeft} from "solid-icons/ai"
+import { useNavigate } from "@solidjs/router";
 
 function Result({ gameInfo, playerInfo }) {
+  const navigate = useNavigate()
   const scores = gameInfo().scores;
   const songs = gameInfo().songs;
   const [loaded, setLoaded] = createSignal(false);
 
   // Calculate results...
-  const voteCounts = {};
+  const voteCounts = Object.keys(scores).reduce((acc, userId) => {
+    acc[userId] = 0;
+    return acc;
+    }, {});
   const songGuessCounts = {};
 
   for (const [userId, userScores] of Object.entries(scores)) {
@@ -80,10 +86,18 @@ function Result({ gameInfo, playerInfo }) {
     }
   });
 
-  console.log(mostGuessedPlayer())
+  console.log(scores)
 
   return (
     <div>
+      <div className="text-xl text-right font-semibold object-cover p-4 pb-2 flex-row relative">
+        <AiOutlineArrowLeft className="relative top-0" size={30} onClick={
+          (evt) => {
+            evt.preventDefault()
+            navigate('/user')
+          }
+        } />
+      </div>
       <h1 class="font-extralight mt-5">Results</h1>
       <Show when={loaded()}>
         <div className="border border-white rounded-md p-2 min-w-1/2 mx-10 my-5">
@@ -103,6 +117,7 @@ function Result({ gameInfo, playerInfo }) {
           <For each={sortedVoteCounts()}>
             {([userId, count]) => {
               console.log(playerInfos);
+              console.log(sortedVoteCounts())
               return (
                 <li>
                   <div className="flex justify-center m-2">

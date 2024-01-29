@@ -37,7 +37,7 @@ function Voting({ gameInfo, playerInfo, userId }) {
           Vote for who you think picked the song!
         </p>
       </div>
-      <WebPlayback gameInfo={gameInfo} />
+      <WebPlayback gameInfo={gameInfo} isHost={userId() == gameInfo().hostid} />
       <Show
         when={!voted()}
         fallback={<>Waiting for other players to vote...</>}

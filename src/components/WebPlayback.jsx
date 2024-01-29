@@ -5,8 +5,6 @@ function WebPlayback({ gameInfo, isHost }) {
   const [playerObj, setPlayerObj] = createSignal(null);
   const [device, setDevice] = createSignal(null);
   const [paused, setPaused] = createSignal(!isHost);
-  const [active, setActive] = createSignal(false);
-  const [ready, setReady] = createSignal(false);
   const [track, setTrack] = createSignal(null);
   const [songPlayed, setSongPlayed] = createSignal('');
 
@@ -66,8 +64,6 @@ function WebPlayback({ gameInfo, isHost }) {
             }
           );
         });
-        setActive(true);
-        setReady(true);
       };
 
       // Ready
@@ -142,11 +138,7 @@ function WebPlayback({ gameInfo, isHost }) {
       <div className="w-full font-light flex justify-center pt-0 mt-0 mb-5">
         <button
           onClick={() => {
-            if (paused()) {
-              playerObj().setVolume(.5);
-            } else {
-              playerObj().setVolume(0);
-            }
+            playerObj().togglePlay();
             setPaused(!paused());
           }}
           className="text-center mx-auto"

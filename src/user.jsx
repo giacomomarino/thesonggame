@@ -96,7 +96,7 @@ function User() {
       <div class="card mt-3">
         <button className="m-2" onClick={(evt) => {
           evt.preventDefault()
-          navigate(`/play/${gamecode()}`)
+          navigate(`/play/${gamecode().toUpperCase()}`)
         }}>
           Join Game
         </button>

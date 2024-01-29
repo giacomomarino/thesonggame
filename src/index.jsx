@@ -17,6 +17,7 @@ render(
                 <Route path="/" component={App} /> {/* 👈 Define the home page route */}
                 <Route path="/user" component={User} />
                 <Route path="/callback" component={Callback} />
+                <Route path="*" component={Callback} />
                 <Route path="/create" component={Create} />
                 <Route path="/play/:gamecode" component={Play} />
             </Routes>
